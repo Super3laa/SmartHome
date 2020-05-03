@@ -29,7 +29,7 @@ void setup() {
   Serial.println(WiFi.softAPIP());
 
   server.on("/", HTTP_GET,handleRoot);
-  server.on("/LED", HTTP_POST,toggleLED);
+  server.on("/LED", HTTP_GET,toggleLED);
   server.begin();
 
 }
@@ -39,10 +39,10 @@ void loop() {
   server.handleClient();
 }
 void toggleLED(){
-  Serial.print("ToggleLed");
+  Serial.println("ToggleLed");
   server.sendHeader("Location","/");
   server.send(303);  
 }
 void handleRoot() {
-  server.send(200,"text/html","<form action=\"/LED\" method=\"POST\"><input type=\"submit\" value=\"Toggle LED\"></form>");
+  server.send(200,"text/html","<form action=\"/LED\" method=\"GET\"><input type=\"submit\" value=\"Toggle LED\"></form>");
 }

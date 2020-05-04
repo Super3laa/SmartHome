@@ -54,6 +54,7 @@ void LED()
 {
   digitalWrite(LED_BUILTIN,!digitalRead(LED_BUILTIN));
   server.send(200, "text/html",HTML);
+  Serial.println("ToggleLed");
 }
 void handleRoot() {
   server.send(200, "text/html",HTML);

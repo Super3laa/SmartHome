@@ -1,6 +1,8 @@
 void LED()
 {
-  digitalWrite(LED_BUILTIN,!digitalRead(LED_BUILTIN));
-  server.send(204, "");
+  server.on("/toggleLED", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(LED_BUILTIN,!digitalRead(LED_BUILTIN));
+    request->send(SPIFFS, "/index.html", String(), false, processor);
+  }); 
   Serial.println("ToggledLed");
 }

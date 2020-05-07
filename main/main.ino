@@ -11,7 +11,7 @@ void setup() {
   SPIFFS.begin();
   handleRoutes();
   server.begin();
-  Serial.println("All is Good");
+  Serial.println("All is Good...");
 }
   
 void loop() { 

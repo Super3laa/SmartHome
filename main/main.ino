@@ -1,160 +1,36 @@
-#include <ESP8266WiFi.h>
-#include <ESP8266WiFiMulti.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
+#include <ESPAsyncWebServer.h>
 #include <FS.h>
-#include <WebSocketsServer.h>
-
-//SoftwareSerial EspSerial(2, 3); // RX, TX
-
-const char *ssid       = "Esp-01"; // The name of the Wi-Fi network that will be created
-const char *password   = "*smarthome*";
-const char *myssid     = "E.A";
-const char *mypassword = "4208694*";
-const char *AP_IP = "192.168.1.17";
-const char* mdnsName = "esp"; // Domain name for the mDNS responder
-//IPAddress local_IP(192, 168, 1, 17);
-//IPAddress gateway(192, 168, 1, 1);
-//IPAddress subnet(255, 255, 255, 0);
-
-ESP8266WebServer server(80);
-
+const char *ssid       = "SmartHome";
+const char *password   = "*2222060*";
+IPAddress local_IP(192, 168, 1, 17);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+AsyncWebServer server(80);
+String HT = "50%27 ";
+String SecurityInfo = "100";
+String Status = "0000000000";
+String html = "<!DOCTYPE html> <html> <head> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> <style> html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: left; /*box-sizing: border-box*/ background:#fafafa; } .wrapper{ display:grid; /* grid-auto-rows: minmax(50px,auto);*/ grid-template-columns: 35fr 35fr 30fr; /* grid-template-rows: 25fr 35fr 40fr;*/ grid-gap:0.5em } .wrapper>div{ background: #ffffff; } .Security{ grid-row: 1/3; grid-column: 1/4; } .garage{ grid-row: 3/4; grid-column: 1; } .garageTitle{ color: #ff793f; padding:0.6em; } .bedroom{ grid-row: 3/4; grid-column: 2; } .bedroomTitle{ color: #ff5252; padding:0.6em; } .bathroom{ grid-row: 3/4; grid-column: 3; } .bathroomTitle{ color: #34ace0; padding:0.6em; } .recep{ grid-row: 4/7; grid-column: 1/3; } .recepTitle{ color: #706fd3; padding:0.6em; } .kitchen{ grid-row: 4/7; grid-column: 3; } .kitchenTitle{ color: #40407a; padding:0.6em; } .garden{ grid-row: 7/10; grid-column: 1/4; } .gardenTitle{ color: #20d66c; padding:0.4em; } .SystemMonitor{ color: #ff5252; padding:0.6em; } .SystemInfo{ margin: 1em; color:#222f3e; } .ButtonInfo{ display: grid; grid-template-columns: 90fr 10fr; margin-left:1em; } .buttonTitle{ color:#222f3e; } .switch { position: relative; display: inline-block; width: 55px; height: 30px; margin-right: 0.5em; margin-top : 0.5em; } .switch input { opacity: 0; width: 0; height: 0; } .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; -webkit-transition: .4s; transition: .4s; } .slider:before { position: absolute; content: \"\"; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; -webkit-transition: .4s; transition: .4s; } input:checked + .slider { background-color: #e74c3c; } input:focus + .slider { box-shadow: 0 0 1px #e74c3c; } input:checked + .slider:before { -webkit-transform: translateX(26px); -ms-transform: translateX(26px); transform: translateX(26px); } .slider.round { border-radius: 34px; } .slider.round:before { border-radius: 50%; } </style> <script> function updateState(){ var xhttp = new XMLHttpRequest(); xhttp.onreadystatechange = function() { if (this.readyState == 4 && this.status == 200) { var data = this.responseText; var i=0; for( i =0 ; i<10 ; i++){ if (data.substr(i,1) == \"1\"){ document.getElementById(`${i+1}`).checked = true; }else{ document.getElementById(`${i+1}`).checked = false ; } } } }; xhttp.open(\"GET\", \"/Status\", false); xhttp.send(); } </script> </head> <body onload=\"updateState()\"> <div class=\"wrapper\"> <div class=\"box Security\"> <h3 class=\"SystemMonitor\">System Monitor</h3> <div class=\"SystemInfo\"> <div> <p><strong>Tempreature : </strong><strong id = \"Tempreature\">21</strong></p> </div> <div> <p><strong>Humidity : </strong><strong id = \"Humidity\">60</strong></p> </div> <div> <p><strong>Gas : </strong><strong id = \"Gas\">No Gas Leak</strong></p> </div> <div> <p><strong>System Security : </strong><strong id = \"SecurityInfo\">Not Secured</strong></p> </div> </div> <div class = \"ButtonInfo\"> <p class =\"buttonTitle\"><strong>Security System Enable/Diablse</strong></p> <label class=\"switch\"> <input type=\"checkbox\" id='1' onclick='getRequest(\"/Security\")'> <span class=\"slider round\"></span> </label> </div> </div> <div class=\"box garage\"> <h2 class=\"garageTitle\">Garage</h2> <div class = \"ButtonInfo\"> <p class =\"buttonTitle\"><strong>Gate</strong></p> <label class=\"switch\"> <input type=\"checkbox\" id ='2' onclick='getRequest(\"/Garage\")'> <span class=\"slider round\"></span> </label> </div> </div> <div class=\"box bedroom\"> <h2 class=\"bedroomTitle\">BedRoom</h2> <div class = \"ButtonInfo\"> <p class =\"buttonTitle\"><strong>Lights</strong></p> <label class=\"switch\"> <input type=\"checkbox\" id ='3'onclick='getRequest(\"/BedRoom\")'> <span class=\"slider round\"></span> </label> </div> </div> <div class=\"box bathroom\"> <h2 class=\"bathroomTitle\">Bathroom</h2> <div class = \"ButtonInfo\"> <p class =\"buttonTitle\"><strong>Lights</strong></p> <label class=\"switch\"> <input type=\"checkbox\" id ='4' onclick='getRequest(\"/Bathroom\")'> <span class=\"slider round\"></span> </label> </div> </div> <div class=\"box recep\"> <h2 class=\"recepTitle\">Reception</h2> <div class = \"ButtonInfo\"> <p class =\"buttonTitle\"><strong>Lights</strong></p> <label class=\"switch\"> <input type=\"checkbox\" id ='5' onclick='getRequest(\"/RLight\")'> <span class=\"slider round\"></span> </label> </div> <div class = \"ButtonInfo\"> <p class =\"buttonTitle\"><strong>Fan</strong></p> <label class=\"switch\"> <input type=\"checkbox\" id ='6' onclick='getRequest(\"/RFan\")'> <span class=\"slider round\"></span> </label> </div> <div class = \"ButtonInfo\"> <p class =\"buttonTitle\"><strong>Curtains</strong></p> <label class=\"switch\"> <input type=\"checkbox\" id ='7' onclick='getRequest(\"/RCurtains\")'> <span class=\"slider round\"></span> </label> </div> </div> <div class=\"box kitchen\"> <h2 class=\"kitchenTitle\">Kitchen</h2> <div class = \"ButtonInfo\"> <p class =\"buttonTitle\"><strong>Lights</strong></p> <label class=\"switch\"> <input type=\"checkbox\"id ='8' onclick='getRequest(\"/Kitchen\")'> <span class=\"slider round\"></span> </label> </div> </div> <div class=\"box garden\"> <h2 class=\"gardenTitle\">Garden</h2> <div class = \"ButtonInfo\"> <p class =\"buttonTitle\"><strong>Lights</strong></p> <label class=\"switch\"> <input type=\"checkbox\" id ='9' onclick='getRequest(\"/GLights\")'> <span class=\"slider round\"></span> </label> </div> <div class = \"ButtonInfo\"> <p class =\"buttonTitle\"><strong>Gate </strong></p> <label class=\"switch\"> <input type=\"checkbox\" id ='10'onclick='getRequest(\"/Gate\")'> <span class=\"slider round\"></span> </label> </div> </div> </div> <script> function getRequest(data){ var xhttp = new XMLHttpRequest(); xhttp.open(\"GET\",`${data}`,false); xhttp.send(); } </script> </body> <script> setInterval(function ( ) { var xhttp = new XMLHttpRequest(); xhttp.onreadystatechange = function() { if (this.readyState == 4 && this.status == 200) { var data = this.responseText; document.getElementById(\"Humidity\").innerHTML =data.substr(0,3); document.getElementById(\"Tempreature\").innerHTML = data.substr(3,3); } }; xhttp.open(\"GET\", \"/TH\", true); xhttp.send(); }, 30000 ) ; setInterval(function ( ) { var xhttp = new XMLHttpRequest(); xhttp.onreadystatechange = function() { if (this.readyState == 4 && this.status == 200) { var data = this.responseText; if (data.substr(0,1) == \"1\"){ document.getElementById(\"SecurityInfo\").innerHTML = \"NOT SECUERED\"; }else{ document.getElementById(\"SecurityInfo\").innerHTML = \"Secuered\"; } if (data.substr(1,1) == \"1\"){ document.getElementById(\"Gas\").innerHTML = \"Gas LEAK\"; }else{ document.getElementById(\"Gas\").innerHTML = \"No Gas leak\"; } if (data.substr(2,1) == \"1\"){ document.getElementById(\"5\").checked = true; }else{ document.getElementById(\"Gas\").checked = false; } } }; xhttp.open(\"GET\", \"/SecurityInfo\", true); xhttp.send(); }, 3000 ) ; </script> </html>";
 void setup() {
-  pinMode(2,OUTPUT);
-  Serial.begin(115200);        // Start the Serial communication to send messages to the computer
-  delay(10);
-  Serial.println("\r\n");
-
-  startWiFi();                 // Start a Wi-Fi access point, and try to connect to some given access points. Then wait for either an AP or STA connection
-
-  // startOTA();                  // Start the OTA service
-
-  startSPIFFS();               // Start the SPIFFS and list all contents
-
-  startWebSocket();            // Start a WebSocket server
-
-  startMDNS();                 // Start the mDNS responder
-
-  startServer();               // Start a HTTP server with a file read handler and an upload handler
-
+  pinMode(2, OUTPUT);
+  Serial.begin(115200);
+  Serial.setTimeout(3);
+  SoftAPInit();
+  handleRoutes();
+  server.begin();
+  Serial.println("All is Good...");
 }
-
-
-
 
 void loop() {
-  webSocket.loop();
-  server.handleClient();
-}
-
-
-
-
-//void startOTA() {}
-
-
-
-
-
-
-  
-//void startSPIFFS{  // Start the SPIFFS and list all contents
-//  SPIFFS.begin();                             // Start the SPI Flash File System (SPIFFS)
-//  Serial.println("SPIFFS started. Contents:");
-//  {
-//    Dir dir = SPIFFS.openDir("/");
-//    while (dir.next()) {                      // List the file system contents
-//      String fileName = dir.fileName();
-//      size_t fileSize = dir.fileSize();
-//      Serial.printf("\tFS File: %s, size: %s\r\n", fileName.c_str(), formatBytes(fileSize).c_str());
-//    }
-//    Serial.printf("\n");
-//  }
-//  }
-//bool handleFileRead(String path) { // send the right file to the client (if it exists)
-//  Serial.println("handleFileRead: " + path);
-//  if (path.endsWith("/")) path += "index.html";          // If a folder is requested, send the index file
-//  String contentType = getContentType(path);             // Get the MIME type
-//  String pathWithGz = path + ".gz";
-//  if (SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) { // If the file exists, either as a compressed archive, or normal
-//    if (SPIFFS.exists(pathWithGz))                         // If there's a compressed version available
-//      path += ".gz";                                         // Use the compressed verion
-//    File file = SPIFFS.open(path, "r");                    // Open the file
-//    size_t sent = server.streamFile(file, contentType);    // Send it to the client
-//    file.close();                                          // Close the file again
-//    Serial.println(String("\tSent file: ") + path);
-//    return true;
-//  }
-//  Serial.println(String("\tFile Not Found: ") + path);   // If the file doesn't exist, return false
-//  return false;
-//}
-//
-//void handleFileUpload(){ // upload a new file to the SPIFFS
-//  HTTPUpload& upload = server.upload();
-//  String path;
-//  if(upload.status == UPLOAD_FILE_START){
-//    path = upload.filename;
-//    if(!path.startsWith("/")) path = "/"+path;
-//    if(!path.endsWith(".gz")) {                          // The file server always prefers a compressed version of a file 
-//      String pathWithGz = path+".gz";                    // So if an uploaded file is not compressed, the existing compressed
-//      if(SPIFFS.exists(pathWithGz))                      // version of that file must be deleted (if it exists)
-//         SPIFFS.remove(pathWithGz);
-//    }
-//    Serial.print("handleFileUpload Name: "); Serial.println(path);
-//    fsUploadFile = SPIFFS.open(path, "w");            // Open the file for writing in SPIFFS (create if it doesn't exist)
-//    path = String();
-//  } else if(upload.status == UPLOAD_FILE_WRITE){
-//    if(fsUploadFile)
-//      fsUploadFile.write(upload.buf, upload.currentSize); // Write the received bytes to the file
-//  } else if(upload.status == UPLOAD_FILE_END){
-//    if(fsUploadFile) {                                    // If the file was successfully created
-//      fsUploadFile.close();                               // Close the file again
-//      Serial.print("handleFileUpload Size: "); Serial.println(upload.totalSize);
-//      server.sendHeader("Location","/success.html");      // Redirect the client to the success page
-//      server.send(303);
-//    } else {
-//      server.send(500, "text/plain", "500: couldn't create file");
-//    }
-//  }
-//}
-
-
-
-void startWebSocket{
-  webSocket.begin();                          // start the websocket server
-  webSocket.onEvent(webSocketEvent);          // if there's an incomming websocket message, go to function 'webSocketEvent'
-  Serial.println("WebSocket server started.");
-  }
-
-
-  
-void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght) { // When a WebSocket message is received
-  switch (type) {
-    case WStype_DISCONNECTED:             // if the websocket is disconnected
-      Serial.printf("[%u] Disconnected!\n", num);
-      break;
-    case WStype_CONNECTED: {              // if a new websocket connection is established
-        IPAddress ip = webSocket.remoteIP(num);
-        Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
-        rainbow = false;                  // Turn rainbow off when a new connection is established
-      }
-      break;
-    case WStype_TEXT:                     // if new text data is received
-      Serial.printf("[%u] get Text: %s\n", num, payload);
-      if (payload[0] == '#') {            // we get RGB data
-        uint32_t rgb = (uint32_t) strtol((const char *) &payload[1], NULL, 16);   // decode rgb data
-        int r = ((rgb >> 20) & 0x3FF);                     // 10 bits per color, so R: bits 20-29
-        int g = ((rgb >> 10) & 0x3FF);                     // G: bits 10-19
-        int b =          rgb & 0x3FF;                      // B: bits  0-9
-
-        analogWrite(LED_RED,   r);                         // write it to the LED output pins
-        analogWrite(LED_GREEN, g);
-        analogWrite(LED_BLUE,  b);
-      } else if (payload[0] == 'R') {                      // the browser sends an R when the rainbow effect is enabled
-        rainbow = true;
-      } else if (payload[0] == 'N') {                      // the browser sends an N when the rainbow effect is disabled
-        rainbow = false;
-      }
-      break;
+  if (Serial.available()) {
+    String data = Serial.readString();
+    if (data.substring(0, 1) == "H") {
+      HT = data.substring(1) + HT.substring(2);
+    } else if (data.substring(0, 1) == "T") {
+      HT = HT.substring(0, 3) + data.substring(1);
+    } else if (data.substring(0, 1) == "P" ) {
+      SecurityInfo = SecurityInfo.substring(0, 2) + data.substring(2);
+    } else if (data.substring(0, 1) == "G" ) {
+      SecurityInfo = SecurityInfo.substring(0, 1) + data.substring(1, 2) + SecurityInfo.substring(2);
+    }
   }
 }

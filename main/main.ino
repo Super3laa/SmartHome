@@ -13,7 +13,7 @@ void setup() {
   pinMode(2, OUTPUT);
   Serial.begin(115200);
   Serial.setTimeout(3);
-  SoftAPInit();
+  SoftAPInit(); 
   handleRoutes();
   server.begin();
   Serial.println("All is Good...");

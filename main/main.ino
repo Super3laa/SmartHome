@@ -1,7 +1,4 @@
 #include <ESPAsyncWebServer.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
-#include <FS.h>
 const char *ssid       = "SmartHome";
 const char *password   = "*2222060*";
 const char *mdnsName       = "esp";
@@ -17,7 +14,7 @@ void setup() {
   pinMode(2, OUTPUT);
   Serial.begin(115200);
   Serial.setTimeout(3);
-
+  SoftAPInit();
   handleRoutes();
   server.begin();
   Serial.println("All is Good...");

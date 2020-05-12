@@ -1,6 +1,4 @@
 void handleRoutes(){
-  SoftAPInit();
-  startMDNS();
   homePage();
   LED();
   tempHum();

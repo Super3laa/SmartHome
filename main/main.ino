@@ -1,9 +1,8 @@
 #include <ESPAsyncWebServer.h>
 const char *ssid       = "SmartHome";
 const char *password   = "*2222060*";
-IPAddress local_IP(192, 168, 1, 17);
-IPAddress gateway(192, 168, 1, 1);
-IPAddress subnet(255, 255, 255, 0);
+const char *mdnsName       = "esp";
+
 AsyncWebServer server(80);
 String HT = "40%27 ";
 String SecurityInfo = "100";
@@ -13,7 +12,7 @@ void setup() {
   pinMode(2, OUTPUT);
   Serial.begin(115200);
   Serial.setTimeout(3);
-  SoftAPInit(); 
+  SoftAPInit();
   handleRoutes();
   server.begin();
   Serial.println("All is Good...");

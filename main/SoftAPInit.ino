@@ -6,5 +6,4 @@ void SoftAPInit(){
   Serial.println(WiFi.softAP(ssid, password) ? "Ready" : "Failed!");
   Serial.print("AP IP address = ");
   Serial.println(WiFi.softAPIP());
-
 }

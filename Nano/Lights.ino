@@ -15,7 +15,7 @@ void pir() {
 
 
 
-void wc() {
+void wc( bool wc_state) {
 
   if (wc_state == 1) {
     digitalWrite(out1, HIGH);
@@ -25,7 +25,7 @@ void wc() {
 }
 
 
-void bed() {
+void bed(bool bed_state) {
 
   if (bed_state == 1) {
     digitalWrite(out2, HIGH);

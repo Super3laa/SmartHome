@@ -28,9 +28,9 @@ bool bed_state  = 0; //Bedroom dark
 bool wc_state   = 0; //Bathroom dark
 bool room_state = 0; //Room dark
 bool fan_state  = 0; //fan off
-bool gas_state  = 0; //gas stable
 int pir_value   = 0;
 int gas_lvl     = 0;
+
 void setup() {
   Serial.begin(115200);
   Serial.setTimeout(2);
@@ -45,9 +45,9 @@ void setup() {
   pinMode(out5, OUTPUT);
 
   dht.begin();
-
-  G.attach(3);
-  C.attach(10);
+  D.attach(3);
+  G.attach(10);
+  C.attach(11);
 
 }
 
@@ -56,32 +56,34 @@ void loop() {
 
   if (Serial.available() > 0) {
     data = Serial.readString();
-    if (data == "Security") {
+    //!data.equals("")
+    if (!data.equals("Security")) {
       sec_state = !sec_state;
-    } else if (data == "Gate") {
+    } else if (!data.equals("Gate")) {
       gate_state = !gate_state ;
       gate(gate_state);
-    } else if (data == "Garage") {
+    } else if (!data.equals("Garage")) {
       car_state = !car_state ;
       Garage(car_state);
-    } else if (data == "Curtains") {
-      Curt_state = !Curt_state ;
+    } else if (!data.equals("Curtains")) {
+      curt_state = !curt_state ;
       Curtains(curt_state);
-    } else if (data == "BedRoom") {
+    } else if (!data.equals("BedRoom")) {
       bed_state = !bed_state ;
       bed(bed_state);
-    } else if (data == "Bathroom") {
+    } else if (!data.equals("Bathroom")) {
       wc_state = !wc_state ;
       wc(wc_state);
-    } else if (data == "RLight") {
+    } else if (!data.equals("RLight")) {
       pir();
-    } else if (data == "RFan") {
+    } else if (!data.equals("RFan")) {
       fan_state = !fan_state ;
-      fan(fan_state);
-    } else if (data == "Kitchen") {
-
+    } else if (!data.equals( "Kitchen")) {
       gas();
     }
+    Serial.println(data);
   }
+  
   security(sec_state);
+ // dht11(fan_state);
 }

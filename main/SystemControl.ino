@@ -11,6 +11,11 @@ void SystemControl()
     toggleString(2);
     request->send(200);
   });
+  server.on("/Elevator", HTTP_GET, [](AsyncWebServerRequest * request) {
+    Serial.print("Elevator");
+    toggleString(11);
+    request->send(200);
+  });
   server.on("/BedRoom", HTTP_GET, [](AsyncWebServerRequest * request) {
     Serial.print("BedRoom");
     toggleString(3);

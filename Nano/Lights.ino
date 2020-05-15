@@ -1,35 +1,14 @@
-void pir() {
+void pir(bool room_state) {
 
   pir_value = digitalRead(PIR);
-  if (pir_value == HIGH ) {
-    digitalWrite(out3, HIGH);  // turn LED ON
-    //   Serial.println("Motion detected!");
-    room_state = 1 ;
+  if (pir_value == 1 & room_state ==1) {
+    digitalWrite(OUT1,!digitalRead(PIR));  
+       Serial.println("Motion detected!");
+    
 
   } else {
-    digitalWrite(out3, LOW); // turn LED OFF
-    //Serial.println("Motion ended!");
-    room_state = 0;
-  }
-}
-
-
-
-void wc( bool wc_state) {
-
-  if (wc_state == 1) {
-    digitalWrite(out1, HIGH);
-  } else {
-    digitalWrite(out1, LOW);
-  }
-}
-
-
-void bed(bool bed_state) {
-
-  if (bed_state == 1) {
-    digitalWrite(out2, HIGH);
-  } else {
-    digitalWrite(out2, LOW);
+    digitalWrite(OUT1, LOW); // turn LED OFF
+    Serial.println("Motion ended!");
+    
   }
 }

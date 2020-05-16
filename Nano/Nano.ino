@@ -1,89 +1,90 @@
 
 #include <Servo.h>
-#include "DHT.h"
+#include <SoftwareSerial.h>
+#include <SimpleDHT.h>
 
-#define DHTTYPE DHT11
 #define DHTPIN A2
-#define proximity A1
+#define proximity A0
 #define Buzzer 13
 #define PIR A3
 #define GAS A0
-#define out1 4
-#define out2 5
-#define out3 6
-#define out4 7
-#define out5 8
+#define OUT1 4
+#define OUT2 5
+#define OUT3 6
+#define OUT4 7
+#define OUT5 8
 #define FAN  9
 
-DHT dht(DHTPIN, DHTTYPE);
+SoftwareSerial Nano(A4, A5); // RX, TX
+
+SimpleDHT11 dht11(DHTPIN);
 
 Servo D, G, C;
 
-String data = "";
 bool sec_state  = 0; //securetiy off
 bool gate_state = 0; //gate closed
 bool curt_state = 0; //Curtains closed
 bool car_state  = 0; //Garage closed
-bool bed_state  = 0; //Bedroom dark
-bool wc_state   = 0; //Bathroom dark
-bool room_state = 0; //Room dark
+bool room_state = 0; //PIR disabled
 bool fan_state  = 0; //fan off
 int pir_value   = 0;
 int gas_lvl     = 0;
 
 void setup() {
   Serial.begin(115200);
-  Serial.setTimeout(2);
+  Serial.setTimeout(3);
 
   pinMode(proximity, INPUT);
   pinMode(PIR, INPUT);
   pinMode(Buzzer, OUTPUT);
-  pinMode(out1, OUTPUT);
-  pinMode(out2, OUTPUT);
-  pinMode(out3, OUTPUT);
-  pinMode(out4, OUTPUT);
-  pinMode(out5, OUTPUT);
+  pinMode(OUT1, OUTPUT);
+  pinMode(OUT2, OUTPUT);
+  pinMode(OUT3, OUTPUT);
+  pinMode(OUT4, OUTPUT);
+  pinMode(OUT5, OUTPUT);
+  pinMode(FAN, OUTPUT);
 
-  dht.begin();
-  D.attach(3);
-  G.attach(10);
-  C.attach(11);
+
 
 }
 
 void loop() {
 
 
-  if (Serial.available() > 0) {
-    data = Serial.readString();
+  if (Serial.available()) {
+    String data = Serial.readString();
     //!data.equals("")
-    if (!data.equals("Security")) {
+    if (data == "BedRoom") {
+      room_state = !room_state;
+      pir(room_state);
+    } else if (data == ("Security")) {
       sec_state = !sec_state;
-    } else if (!data.equals("Gate")) {
-      gate_state = !gate_state ;
-      gate(gate_state);
-    } else if (!data.equals("Garage")) {
-      car_state = !car_state ;
-      Garage(car_state);
-    } else if (!data.equals("Curtains")) {
-      curt_state = !curt_state ;
-      Curtains(curt_state);
-    } else if (!data.equals("BedRoom")) {
-      bed_state = !bed_state ;
-      bed(bed_state);
-    } else if (!data.equals("Bathroom")) {
-      wc_state = !wc_state ;
-      wc(wc_state);
-    } else if (!data.equals("RLight")) {
-      pir();
-    } else if (!data.equals("RFan")) {
-      fan_state = !fan_state ;
-    } else if (!data.equals( "Kitchen")) {
-      gas();
+      security (sec_state );
+    } else if (data == ("Gate")) {
+      Nano.print("Gate");
+    } else if (data == ( "Garage")) {
+      Nano.print("Garage");
+    } else if (data == ("Elevator")) {
+      Nano.print("Elevator");
+    } else if (data == ("Curtains")) {
+      Nano.print("Curtains");
+    } else if (data == ("RFan")) {
+      fan_state = !fan_state;
+    } else if (data == ("Bathroom")) {
+      digitalWrite(OUT2, !digitalRead(OUT2));
+
+    } else if (data == ("RLight")) {
+      digitalWrite(OUT3, !digitalRead(OUT3));
+
+    }  else if (data == ( "Kitchen") ) {
+      digitalWrite(OUT4, !digitalRead(OUT4));
+
+    } else if (data == ( "GLights")) {
+      digitalWrite(OUT5, !digitalRead(OUT5));
+
     }
-    Serial.println(data);
+
   }
-  
-  security(sec_state);
- // dht11(fan_state);
+  dht(fan_state);
+  security (sec_state );
 }

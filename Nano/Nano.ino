@@ -1,4 +1,3 @@
-
 #include <Servo.h>
 #include <SoftwareSerial.h>
 #include <SimpleDHT.h>
@@ -19,19 +18,19 @@ SoftwareSerial Nano(A4, A5); // RX, TX
 
 SimpleDHT11 dht11(DHTPIN);
 
-Servo D, G, C;
+Servo G;
 
 bool sec_state  = 0; //securetiy off
 bool gate_state = 0; //gate closed
 bool curt_state = 0; //Curtains closed
 bool car_state  = 0; //Garage closed
 bool room_state = 0; //PIR disabled
-bool fan_state  = 0; //fan off
 int pir_value   = 0;
 int gas_lvl     = 0;
 
 void setup() {
   Serial.begin(115200);
+  Nano.begin(9600);
   Serial.setTimeout(3);
 
   pinMode(proximity, INPUT);
@@ -63,13 +62,14 @@ void loop() {
     } else if (data == ("Gate")) {
       Nano.print("Gate");
     } else if (data == ( "Garage")) {
-      Nano.print("Garage");
+      car_state = !car_state;
+      Garage(car_state);
     } else if (data == ("Elevator")) {
       Nano.print("Elevator");
     } else if (data == ("Curtains")) {
       Nano.print("Curtains");
     } else if (data == ("RFan")) {
-      fan_state = !fan_state;
+      Nano.print("RFan");
     } else if (data == ("Bathroom")) {
       digitalWrite(OUT2, !digitalRead(OUT2));
 
@@ -85,6 +85,6 @@ void loop() {
     }
 
   }
-  dht(fan_state);
+  dht();
   security (sec_state );
 }

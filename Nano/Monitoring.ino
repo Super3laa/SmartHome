@@ -1,28 +1,26 @@
-void dht(bool fan_state) {
-  byte t = 0;
-  byte h = 0;
+void dht() {
+  byte t      = 0;
+  byte h      = 0;
+  byte last_t = 0;
+  byte last_h = 0;
   int err = SimpleDHTErrSuccess;
+  
   if ((err = dht11.read(&t, &h, NULL)) != SimpleDHTErrSuccess) {
     //Serial.print("Read DHT11 failed, err="); Serial.println(err);
     delay(1000);
     return;
   }
 
-
+if(last_t != t){ 
   Serial.print("T"); Serial.print((int)t);
+  Nano.print("T"); Nano.print(String((int)t));
+}
+if(last_h != h){
   Serial.print("H"); Serial.print((int)h);
-
-  if (fan_state == 1) {
-    if (int(t) >= 23) {
-      analogWrite(FAN, 127);
-    } else if (int(t) >= 23) {
-      analogWrite(FAN, 255);
-    }
-
-  } else {
-    analogWrite(FAN, 0);
-  }
-
+  Nano.print("H"); Nano.print(String((int)h));
+}
+last_t=t;
+last_h=h;
 }
 
 

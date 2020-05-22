@@ -3,7 +3,7 @@
 #include <SimpleDHT.h>
 
 #define DHTPIN A2
-#define proximity A0
+#define proximity A1
 #define Buzzer 13
 #define PIR A3
 #define GAS A0
@@ -12,7 +12,7 @@
 #define OUT3 6
 #define OUT4 7
 #define OUT5 8
-#define FAN  9
+
 
 SoftwareSerial Nano(A4, A5); // RX, TX
 
@@ -20,13 +20,14 @@ SimpleDHT11 dht11(DHTPIN);
 
 Servo G;
 
-bool sec_state  = 0; //securetiy off
-bool gate_state = 0; //gate closed
-bool curt_state = 0; //Curtains closed
-bool car_state  = 0; //Garage closed
-bool room_state = 0; //PIR disabled
-int pir_value   = 0;
-int gas_lvl     = 0;
+bool sec_state   = 0; //securetiy off
+bool gate_state  = 0; //gate closed
+bool curt_state  = 0; //Curtains closed
+bool car_state   = 0; //Garage closed
+bool sound_state = 0;
+bool last_sound  = 0;
+int pir_value    = 0;
+int gas_lvl      = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -35,15 +36,17 @@ void setup() {
 
   pinMode(proximity, INPUT);
   pinMode(PIR, INPUT);
+  pinMode(GAS, INPUT);
   pinMode(Buzzer, OUTPUT);
   pinMode(OUT1, OUTPUT);
   pinMode(OUT2, OUTPUT);
   pinMode(OUT3, OUTPUT);
   pinMode(OUT4, OUTPUT);
   pinMode(OUT5, OUTPUT);
-  pinMode(FAN, OUTPUT);
 
 
+  G.attach(3);
+  G.write(0);
 
 }
 
@@ -53,12 +56,8 @@ void loop() {
   if (Serial.available()) {
     String data = Serial.readString();
     //!data.equals("")
-    if (data == "BedRoom") {
-      room_state = !room_state;
-      pir(room_state);
-    } else if (data == ("Security")) {
+    if (data == ("Security")) {
       sec_state = !sec_state;
-      security (sec_state );
     } else if (data == ("Gate")) {
       Nano.print("Gate");
     } else if (data == ( "Garage")) {
@@ -70,6 +69,9 @@ void loop() {
       Nano.print("Curtains");
     } else if (data == ("RFan")) {
       Nano.print("RFan");
+    } else if (data == ( "GLights")) {
+      digitalWrite(OUT1, !digitalRead(OUT1));
+
     } else if (data == ("Bathroom")) {
       digitalWrite(OUT2, !digitalRead(OUT2));
 
@@ -79,12 +81,11 @@ void loop() {
     }  else if (data == ( "Kitchen") ) {
       digitalWrite(OUT4, !digitalRead(OUT4));
 
-    } else if (data == ( "GLights")) {
+    }  else if (data == ( "BedRoom") ) {
       digitalWrite(OUT5, !digitalRead(OUT5));
-
     }
-
   }
   dht();
+  gas();
   security (sec_state );
 }

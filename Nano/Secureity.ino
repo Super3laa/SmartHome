@@ -18,14 +18,16 @@ void Garage(int car_state) {
 
   int pos;
   if (car_state == 1) {
-    for (pos = 0; pos <= 180; pos += 1) {
+    for (pos = 0; pos <= 120; pos += 1) {
       G.write(pos);
+      delay(25);
     }
   } else {
-    for (pos = 180; pos >= 0; pos -= 1) {
+    for (pos = 120; pos >= 0; pos -= 1) {
       G.write(pos);
+      delay(25);
     }
-    delay(15);
+    
 
   }
 

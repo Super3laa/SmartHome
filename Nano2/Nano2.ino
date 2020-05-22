@@ -1,4 +1,3 @@
-
 #define Ain1  7
 #define Ain2  5
 #define Ain3  4
@@ -13,12 +12,10 @@
 #define Fan_pin  11
 #define Curt_pin  9
 
-#define SW1  A0
-#define SW2  A1
-#define SW3  A2
-#define SW4  A3
-
-#define SOUND  A4
+#define SW1  A1
+#define SW2  A2
+#define SW3  A3
+#define SW4  A4
 
 bool fan_state  = 0 ;
 int  Gate_speed    = 150;
@@ -28,10 +25,12 @@ int  Fan_speed    = 100;
 
 bool G_sw1 = 0;
 bool G_sw2 = 0;
+
 bool E_sw1 = 0;
 bool E_sw2 = 0;
 
 int t, h;
+
 int Flag_G = 0;
 int Flag_E = 0;
 
@@ -52,18 +51,18 @@ void setup() {
   pinMode(Fan_pin, OUTPUT);
   pinMode(Curt_pin, OUTPUT);
 
-  pinMode(G_sw1, INPUT_PULLUP);
-  pinMode(G_sw2, INPUT_PULLUP);
-  pinMode(E_sw1, INPUT_PULLUP);
-  pinMode(E_sw2, INPUT_PULLUP);
+  pinMode(SW1, INPUT_PULLUP);
+  pinMode(SW2, INPUT_PULLUP);
+  pinMode(SW3, INPUT_PULLUP);
+  pinMode(SW4, INPUT_PULLUP);
 
   digitalWrite(Bin1, 0);
   digitalWrite(Bin2, 1);
+  pinMode(A0,OUTPUT);
 
 }
 
 void loop() {
-
   if (Serial.available() ) {
     String NanoData = Serial.readString();
     if (NanoData == "Gate") {
@@ -72,16 +71,10 @@ void loop() {
       Fan();
     } else if (NanoData == "Elevator") {
       Elevator();
-    }  else if (NanoData == "Curtains") {
+    } else if (NanoData == "Curtains") {
       Curtains();
     }
-    //else if (NanoData.substring(0, 1) == "T") {
-    //      t = (NanoData.substring(1)).toInt();
-    //    } else if (NanoData.substring(0, 1) == "H") {
-    //      h = (NanoData.substring(1)).toInt();
-    //    }
   }
-
   if (Flag_G) {
     G_sw1 = digitalRead(SW1);
     G_sw2 = digitalRead(SW2);
@@ -90,27 +83,23 @@ void loop() {
       Flag_G = 0;
     }
   }
-
-
-if (Flag_E) {
-  E_sw1 = digitalRead(SW3);
-  E_sw2 = digitalRead(SW4);
-  if (E_sw1 == 0 || E_sw2 == 0) {
-    analogWrite(Elev_pin, 0 );
-    Flag_E = 0;
+  if (Flag_E) {
+    E_sw1 = digitalRead(SW3);
+    E_sw2 = digitalRead(SW4);
+    if (E_sw1 == 0 || E_sw2 == 0) {
+      analogWrite(Elev_pin, 0 );
+      Flag_E = 0;
+    }
   }
 }
-}
-
-
 void Gate() {
   G_sw1 = digitalRead(SW1);
   G_sw2 = digitalRead(SW2);
-  if (G_sw1 == 0 & G_sw2 == 1) {
+  if (G_sw1 == 0 and G_sw2 == 1) {
     digitalWrite(Ain1, 1);
     digitalWrite(Ain2, 0);
     analogWrite(Gate_pin, Gate_speed);
-  } else if (G_sw1 == 1 & G_sw2 == 0) {
+  } else if (G_sw1 == 1 and G_sw2 == 0) {
     digitalWrite(Ain1, 0);
     digitalWrite(Ain2, 1);
     analogWrite(Gate_pin, Gate_speed);
@@ -121,20 +110,18 @@ void Gate() {
 void Elevator() {
   E_sw1 = digitalRead(SW3);
   E_sw2 = digitalRead(SW4);
-
-
-  if (E_sw1 == 0 & E_sw2 == 1) {
+  if (E_sw1 == 0 and E_sw2 == 1) {
     digitalWrite(Ain3, 1);
     digitalWrite(Ain4, 0);
     analogWrite(Elev_pin, Gate_speed);
-   
-  } else if (E_sw1 == 1 & E_sw2 == 0) {
+
+  } else if (E_sw1 == 1 and E_sw2 == 0) {
     digitalWrite(Ain3, 0);
     digitalWrite(Ain4, 1);
     analogWrite(Elev_pin, Gate_speed);
-    
+
   }
- Flag_G = 1;
+  Flag_G = 1;
 }
 void Curtains() {
   digitalWrite(Bin1, !digitalRead(Bin1));
@@ -149,7 +136,6 @@ void Fan() {
     digitalWrite(Bin3, 0);
     digitalWrite(Bin4, 1);
     analogWrite(Fan_pin, Fan_speed);
-
   } else {
     analogWrite(Fan_pin, 0);
   }

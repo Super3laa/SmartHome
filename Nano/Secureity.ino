@@ -1,21 +1,16 @@
-void security (bool sec_state ) {
+void security () {
   int prox_value = digitalRead(proximity);
-  //  Serial.print(sec_state);
-  //  Serial.print("\t");
-  //  Serial.println(prox_value);
-  if ( (prox_value == 1) & (sec_state == 1) ) {
-    tone(Buzzer, 1000);
-
-
+  if ((prox_value == 1) and (sec_state == 1) ) {
+    digitalWrite(Buzzer, HIGH);
+    digitalWrite(9, HIGH);
   } else {
-    tone(Buzzer, 10000);
+    digitalWrite(Buzzer, LOW);
+    digitalWrite(9, LOW);
   }
-
 }
 
 
-void Garage(int car_state) {
-
+void Garage() {
   int pos;
   if (car_state == 1) {
     for (pos = 0; pos <= 120; pos += 1) {
@@ -27,8 +22,5 @@ void Garage(int car_state) {
       G.write(pos);
       delay(25);
     }
-    
-
   }
-
 }

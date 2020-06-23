@@ -2,12 +2,13 @@
 #include <ESPAsyncTCP.h>
 #include <ESP8266WiFi.h>
 
-const char *ssid       = "SmartHome";
-const char *password   = "*2222060*";
-IPAddress local_IP(192, 168, 1, 17);
+const char *ssid       = "Walid ahmed";
+const char *password   = "01065532784";
+IPAddress local_IP(192, 168, 1, 184);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 AsyncWebServer server(80);
+
 String HT = "40%27 ";
 String SecurityInfo = "100";
 String Status = "00000000000";
